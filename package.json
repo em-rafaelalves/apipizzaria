@@ -1,0 +1,24 @@
+{
+  "name": "sperli-API",
+  "version": "1.0.0",
+  "description": "api da pizzaria do senac",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "node --watch src/index.js"
+  },
+  "author": "sperli",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "chalk": "^6.0.0",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",  
+    "express": "^5.2.1",
+    "helmet": "^8.3.0",
+    "joi": "^18.2.9",
+    "jsonwebtoken": "^9.0.3",
+    "morgan": "^1.12.1",
+    "mysql2": "^3.24.4"
+  }
+}
