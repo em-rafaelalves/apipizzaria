@@ -1,5 +1,5 @@
 // src/controllers/authController.js
-import jwt from 'jsonwebtoker';
+import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import * as clienteService from '../services/clienteService.js';
 export const login = async (req, res) => {
@@ -7,13 +7,13 @@ export const login = async (req, res) => {
     try {
         // 1. Verificar se o usuário existe no banco de dados
         const clientes = await clienteService.findAll(cpf);
-        const cliente=cliente[0];
+        const cliente=clientes[0];
        
         if (!cliente) {
             return res.status(401).json({ message: "Credenciais inválidas"});
         }
         // 2. Comparar a senha enviada com o hash salvo no banco
-        const senhaValida = await bcrypt.compare(senha, cliente )
+        const senhaValida = await bcrypt.compare(senha, cliente.senha )
         if (!senhaValida) {
             return res.status(401).json({mensage: "Credenciais inválidas"})  
          }
