@@ -7,26 +7,29 @@ import Joi from 'joi';
 //Criação dos Schemas que o validate irá usar para validar dados do usuário
 export const produtoCreateSchema = Joi.object({
   idProduto: Joi.string().length(10).required(),
-  nome: Joi.string().required().max(100),
-  descricao: Joi.string().max(200).allow(''),
-  preco: Joi.number().positive().required(),
-  categoria: Joi.string().max(50).allow(''),
+  nomeProduto: Joi.string().required().max(100),
+ categoria: Joi.string().max(50).allow(''), 
+  valorMin: Joi.number().positive().required(),
+  valorMax: Joi.number().positive(),
+  tipo: Joi.string().max(200).allow(''),
 });
 
 export const produtoUpdateSchema = Joi.object({
-  nome: Joi.string().max(100),
+  idProduto: Joi.string().length(10).required(),
+  nomeProduto: Joi.string().max(100),
   descricao: Joi.string().max(200).allow(''),
-  preco: Joi.number().positive(),
-  categoria: Joi.string().max(50).allow(''),
+  valorMin: Joi.number().positive().required(),
+  valorMax: Joi.number().positive(),
+  tipo: Joi.string().max(50).allow(''),
 }).min(1);
 
 export const listarProdutos = async (req, res) => {
     try {
       // Capturamos os parâmetros de consulta da URL
       // ex: ?idProduto=12345 / ?nome=produto / ?categoria=categoria
-      const { idProduto, nome, categoria } = req.query;
+      const { idProduto, nomeProduto, tipo, valorMin, valorMax} = req.query;
       // Passamos todos os filtros para o serviço
-      const produtos = await produtoService.findAll(idProduto, nome, categoria);
+      const produtos = await produtoService.findAll(idProduto, nomeProduto, valorMin, valorMax, tipo);
     // Lista vazia é uma resposta válida: 200 com []
       res.json(produtos);
     } catch (err) {
