@@ -1,76 +1,106 @@
-// src/services/produtoServices.js
 import db from '../db/db.js';
-import bcrypt from 'bcrypt';
 
-export const findAll = async (idProduto, nomeProduto, valorMin, valorMax, tipo) => {
-  // 1. Define a consulta SQL base
+// LISTAR E FILTRAR PRODUTOS
+export const findAll = async (
+  idProduto,
+  nomeProduto,
+  valorMin,
+  valorMax,
+  tipo
+) => {
+
   let sql = 'SELECT * FROM produto';
-  // 2. Cria um array para as condições WHERE
+
   const conditions = [];
-  // 3. Cria um array para os valores (para prevenir SQL Injection)
   const values = [];
-  // 4. Adiciona as condições dinamicamente
-  // Adicionamos o filtro de CPF
+
   if (idProduto) {
     conditions.push('idProduto = ?');
     values.push(idProduto);
   }
-  // Adicionamos o filtro de nome
+
   if (nomeProduto) {
     conditions.push('LOWER(nomeProduto) LIKE ?');
     values.push(`%${nomeProduto.toLowerCase()}%`);
   }
-  // Adicionamos o filtro de email
+
   if (tipo) {
     conditions.push('tipo = ?');
     values.push(tipo);
   }
 
-  if(valorMin){
+  if (valorMin !== undefined && valorMin !== '') {
     conditions.push('valor >= ?');
     values.push(valorMin);
   }
-  if(valorMax){
+
+  if (valorMax !== undefined && valorMax !== '') {
     conditions.push('valor <= ?');
     values.push(valorMax);
   }
-  // 5. Se houver condições, anexa elas à consulta SQL
+
   if (conditions.length > 0) {
     sql += ' WHERE ' + conditions.join(' AND ');
   }
-  // 6. Executa a consulta final
-  const [rows] = await db.query(sql, values);
-  return rows;
 
+  sql += ' ORDER BY idProduto ASC';
+
+  const [rows] = await db.query(sql, values);
+
+  return rows;
 };
 
+// BUSCAR PRODUTO POR ID
+export const findById = async (idProduto) => {
 
-export const create = async (clienteData) => {
-  const saltRounds = 10;
-  const hashedPassword = await bcrypt.hash(clienteData.senha, saltRounds);
+  const [rows] = await db.query(
+    'SELECT * FROM produto WHERE idProduto = ?',
+    [idProduto]
+  );
 
-  const newProduto = {
-    ...clienteData,
-    senha: hashedPassword,
-    tipo: 'cliente',
+  return rows[0];
+};
+
+// CADASTRAR PRODUTO
+export const create = async (produtoData) => {
+
+  const novoProduto = {
+    nomeProduto: produtoData.nomeProduto,
+    descricao: produtoData.descricao,
+    tipo: produtoData.tipo,
+    valor: produtoData.valor,
+    imagem: produtoData.imagem
   };
 
-  await db.query('INSERT INTO produto SET ?', newProduto);
+  const [result] = await db.query(
+    'INSERT INTO produto SET ?',
+    [novoProduto]
+  );
 
-  delete newProduto.senha;
-  return newProduto;
+  return {
+    idProduto: result.insertId,
+    ...novoProduto
+  };
 };
 
-export const update = async (idProduto, clienteData) => {
-  if (clienteData.senha) {
-    const saltRounds = 10;
-    clienteData.senha = await bcrypt.hash(clienteData.senha, saltRounds);
-  }
-  const [result] = await db.query('UPDATE produto SET ? WHERE idProduto = ?', [clienteData, idProduto]);
+// ATUALIZAR PRODUTO
+export const update = async (idProduto, produtoData) => {
+
+  const [result] = await db.query(
+    'UPDATE produto SET ? WHERE idProduto = ?',
+    [produtoData, idProduto]
+  );
+
   return result.affectedRows > 0;
 };
 
+// DELETAR PRODUTO
 export const remove = async (idProduto) => {
-  const [result] = await db.query('DELETE FROM produto WHERE idProduto = ?', [idProduto]);
+
+  const [result] = await db.query(
+    'DELETE FROM produto WHERE idProduto = ?',
+    [idProduto]
+  );
+
   return result.affectedRows > 0;
 };
