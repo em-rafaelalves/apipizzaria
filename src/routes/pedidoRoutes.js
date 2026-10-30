@@ -24,10 +24,7 @@ router.post(
 );
 
 // LISTAR PEDIDOS
-router.get(
-  '/',
-  pedidoController.listarPedidos
-);
+router.get('/', pedidoController.listarPedidos);
 
 // BUSCAR PEDIDO POR ID
 router.get(
